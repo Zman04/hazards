@@ -50,6 +50,9 @@ class Pipeline:
 
             i += 1
 
+            if i > 10:
+                done = True
+
 if __name__ == "__main__":
     sim = Pipeline("risc-v_instrucitons.bin")
     sim.run()
