@@ -9,4 +9,17 @@ class Pipeline:
         self.ex_mem = None
         self.mem_wb = None
 
-    
+    def load_binary(self, binary_path):
+        instructions = []
+        try:
+            with open(binary_path, 'rb') as f:
+                # Read 4 bytes (32 bits) at a time
+                while chunk := f.read(4):
+                    if len(chunk) == 4:
+                        # Convert the 4 raw bytes back into a single Python integer
+                        instruction = int.from_bytes(chunk, byteorder='little')
+                        instructions.append(instruction)
+        except FileNotFoundError:
+            print(f"Error: Could not find {binary_path}")
+            
+        return instructions
