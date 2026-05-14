@@ -23,3 +23,14 @@ class Pipeline:
             print(f"Error: Could not find {binary_path}")
             
         return instructions
+
+    def fetch(self):
+        pass
+    def decode(self):
+        pass
+    def execute(self):
+        pass
+    def memory(self):
+        pass
+    def write_back(self):
+        pass
