@@ -34,3 +34,22 @@ class Pipeline:
         pass
     def write_back(self):
         pass
+
+    def run_simulation(self):
+        i = 0
+        done = False
+
+        print("Cycle,Instr,Op,Fct3,Rd,Rs1,Rs2,RegWrite,ALUSrc,FwdA,FwdB,MemRd,MemWr,WBSel,bne")
+
+        while (done != True):
+            self.write_back()
+            self.memory()
+            self.execute()
+            self.decode()
+            self.fetch()
+
+            i += 1
+
+if __name__ == "__main__":
+    sim = Pipeline("risc-v_instrucitons.bin")
+    sim.run()
