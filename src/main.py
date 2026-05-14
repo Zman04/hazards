@@ -92,7 +92,7 @@ class Pipeline:
 
     def write_back(self):
         
-        self.mem_wb = None
+        pass
 
     def run_simulation(self):
         i = 0
@@ -107,27 +107,27 @@ class Pipeline:
             self.decode()
             self.fetch()
 
-        if self.mem_wb:
-            print(f"{nCycle},"
-                f"{self.mem_wb['instruction']},"
-                f"{self.mem_wb['opcode']},"
-                f"{self.mem_wb['funct3']},"
-                f"{self.mem_wb['rd']},"
-                f"{self.mem_wb['rs1']},"
-                f"{self.mem_wb['rs2']},"
-                f"{self.mem_wb['RegWrite']},"
-                f"{self.mem_wb['ALUSrc']},"
-                f"0,0,"  # Placeholders for FwdA and FwdB
-                f"{self.mem_wb['MemRd']},"
-                f"{self.mem_wb['MemWr']},"
-                f"{self.mem_wb['WBSel']},"
-                f"{self.mem_wb['bne']}")
+            if self.mem_wb:
+                print(f"{i},"
+                    f"{self.mem_wb['instruction']},"
+                    f"{self.mem_wb['opcode']},"
+                    f"{self.mem_wb['funct3']},"
+                    f"{self.mem_wb['rd']},"
+                    f"{self.mem_wb['rs1']},"
+                    f"{self.mem_wb['rs2']},"
+                    f"{self.mem_wb['RegWrite']},"
+                    f"{self.mem_wb['ALUSrc']},"
+                    f"*,*,"  # Placeholders for FwdA and FwdB
+                    f"{self.mem_wb['MemRd']},"
+                    f"{self.mem_wb['MemWr']},"
+                    f"{self.mem_wb['WBSel']},"
+                    f"{self.mem_wb['bne']}")
 
             i += 1
 
-            if i > 10:
+            if i > 15:
                 done = True
 
 if __name__ == "__main__":
-    sim = Pipeline("risc-v_instrucitons.bin")
+    sim = Pipeline("risc-v_instructions.bin")
     sim.run_simulation()
