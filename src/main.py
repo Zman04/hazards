@@ -35,6 +35,11 @@ class Pipeline:
             self.if_id = None
 
     def decode(self):
+
+        if self.if_id is None:
+            self.id_ex = None
+            return
+
         instruction = self.if_id["instruction"]
         opcode = (instruction) & (2**7 - 1)
         rd = (instruction >> 7) & (2**5 - 1)
@@ -52,11 +57,24 @@ class Pipeline:
             "rs2": rs2
         }
     def execute(self):
-        pass
+
+        if self.id_ex is None:
+            self.ex_mem = None
+            return
+        else:
+            self.ex_mem = self.id_ex
+
     def memory(self):
-        pass
+        
+        if self.ex_mem is None:
+            self.mem_wb = None
+            return
+        else:
+            self.mem_wb = self.ex_mem
+
     def write_back(self):
-        pass
+        
+        self.mem_wb = None
 
     def run_simulation(self):
         i = 0
