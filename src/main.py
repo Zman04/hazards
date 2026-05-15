@@ -81,10 +81,10 @@ class Pipeline:
             "funct3": funct3,
             "rs1": rs1,
             "rs2": rs2,
-            "RegWrite": reg_write,
+            "RegWrite": reg_write, # Determines if the instruction writes a result back to a register
             "ALUSrc": alu_src,
-            "MemRd": mem_rd,
-            "MemWr": mem_wr,
+            "MemRd": mem_rd, # Determines if the instruction reads from data memory
+            "MemWr": mem_wr, # Determines if the instruction writes data into memory
             "WBSel": wb_sel,
             "bne": bne,
             "val1": self.x5 if rs1 == 5 else 0, # Hardcoded: if rs1 is x5, give it x5's value
@@ -95,6 +95,11 @@ class Pipeline:
         if self.id_ex is None:
             self.ex_mem = None
             return
+        if self.ex_mem and self.id_ex["rs1"] == self.ex_mem["rd"] and self.ex_mem["RegWrite"] == 1 and self.ex_mem["rd"] != 0:
+            # Trigger the FwdA signal
+            fwd_a = 1
+
+        
             
         # Branch handling logic
         if self.id_ex["bne"] == 1:
