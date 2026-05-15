@@ -11,6 +11,7 @@ def b2s(num):
                 "00000000000100110000001100010011", "00000000011000111010010000100011"]
 '''
 
+'''
 # branch simulation
 offset = -10 & 0xFFF 
 
@@ -35,7 +36,15 @@ integer_instructions = [
 ]
 
 instructions = [f"{instr:032b}" for instr in integer_instructions]
+'''
 
+instructions = [
+    "01000000001100001000000100110011",  # sub x2,  x1,  x3
+    "00000000010100010111011000110011",  # and x12, x2,  x5
+    "00000000001000110110011010110011",  # or  x13, x6,  x2
+    "00000000110101100111000100110011",  # and x2,  x12, x13
+    "00000000001000010000011100110011",  # add x14, x2,  x2
+]
 for idx, ii in enumerate(instructions):
     if not len(ii) == 32:
         raise ValueError("Not correct length at index %d: got %d bits (%s)" % (idx, len(ii), ii))
@@ -51,5 +60,5 @@ for ii in instructions:
     all_bytes.append((ii >> 24) & mask)
 all_bytes_array = bytearray(all_bytes)
 bin(all_bytes_array[0]), bin(all_bytes_array[-1])
-with open("branch_instructions.bin", 'wb+') as rv_file:
+with open("hazard_instructions.bin", 'wb+') as rv_file:
     rv_file.write(all_bytes_array)
