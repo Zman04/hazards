@@ -48,7 +48,7 @@ class Pipeline:
         rs1 = (instruction >> 15) & (2**5 - 1)
         rs2 = (instruction >> 20) & (2**5 - 1)
 
-        reg_write = mem_rd = mem_wr = wb_sel = bne = 0
+        reg_write = mem_rd = mem_wr = wb_sel = bne = imm = 0
         alu_src = 1
 
         if opcode == 3: # lw
@@ -108,6 +108,10 @@ class Pipeline:
                 
                 # Flush the accidentally fetched instruction from the Decode pipeline register
                 self.if_id = None 
+                
+        if self.id_ex["opcode"] == 19 and self.id_ex["rd"] == 5:
+            # If it's an addi targetting x5, decrement our counter
+            self.x5 -= 1
 
         # Pass the dictionary to the next stage
         self.ex_mem = self.id_ex
