@@ -2,6 +2,7 @@ class Pipeline:
     def __init__(self, binary_path):
         self.pc = 0
         self.instructions = self.load_binary(binary_path) # Functions as memory
+        self.x5 = 3 # Hardcoded counter for the branch logic
         self.branch_counter = 0
 
         self.if_id = None # Pipeline Register
@@ -60,6 +61,17 @@ class Pipeline:
             reg_write = 1
         elif opcode == 99: # bne
             bne = 1
+            imm_12    = (instruction >> 31) & 0x1
+            imm_11    = (instruction >> 7)  & 0x1
+            imm_10_5  = (instruction >> 25) & 0x3F
+            imm_4_1   = (instruction >> 8)  & 0xF
+            
+            # Combine and multiply by 2 (left shift 1) 
+            imm = (imm_12 << 12) | (imm_11 << 11) | (imm_10_5 << 5) | (imm_4_1 << 1)
+            
+            # Handle sign extension for the negative jump
+            if imm & 0x1000:
+                imm -= 0x2000
 
         self.id_ex = {
             "instruction": instruction,
@@ -75,16 +87,30 @@ class Pipeline:
             "MemWr": mem_wr,
             "WBSel": wb_sel,
             "bne": bne,
+            "val1": self.x5 if rs1 == 5 else 0, # Hardcoded: if rs1 is x5, give it x5's value
+            "val2": 0,                          # bne x5, x0, Loop (x0 is always 0)
             "imm": imm
         }
     def execute(self):
-
         if self.id_ex is None:
             self.ex_mem = None
             return
-        else:
-            self.ex_mem = self.id_ex
+            
+        # Branch handling logic
+        if self.id_ex["bne"] == 1:
+            # Check if values are not equal
+            if self.id_ex["val1"] != self.id_ex["val2"]: 
+                # Calculate the jump address
+                target_address = self.id_ex["pc"] + self.id_ex["imm"]
+                
+                # Update the PC so the Fetch stage grabs the right instruction next
+                self.pc = target_address
+                
+                # Flush the accidentally fetched instruction from the Decode pipeline register
+                self.if_id = None 
 
+        # Pass the dictionary to the next stage
+        self.ex_mem = self.id_ex
     def memory(self):
         
         if self.ex_mem is None:
