@@ -153,45 +153,55 @@ class Pipeline:
         
         pass
 
-    def run_simulation(self):
+    def run_simulation(self, output_csv):
+        import csv
         i = 0
         done = False
 
-        print("Cycle,Instr,Op,Fct3,Rd,Rs1,Rs2,RegWrite,ALUSrc,FwdA,FwdB,MemRd,MemWr,WBSel,bne")
+        with open(output_csv, 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow([
+                "Cycle", "Instr", "Op", "Fct3", "Rd", "Rs1", "Rs2",
+                "RegWrite", "ALUSrc", "FwdA", "FwdB", "MemRd", "MemWr", "WBSel", "bne"
+            ])
 
-        while (done != True):
-            self.write_back()
+            while not done:
+                self.write_back()
 
-            old_mem_wb = self.mem_wb
+                old_mem_wb = self.mem_wb
 
-            self.memory()
-            self.execute(old_mem_wb)
-            self.decode()
-            self.fetch()
+                self.memory()
+                self.execute(old_mem_wb)
+                self.decode()
+                self.fetch()
 
-            if self.mem_wb:
-                print(f"{i},"
-                    f"{self.mem_wb['instruction']},"
-                    f"{self.mem_wb['opcode']},"
-                    f"{self.mem_wb['funct3']},"
-                    f"{self.mem_wb['rd']},"
-                    f"{self.mem_wb['rs1']},"
-                    f"{self.mem_wb['rs2']},"
-                    f"{self.mem_wb['RegWrite']},"
-                    f"{self.mem_wb['ALUSrc']},"
-                    f"{self.mem_wb['FwdA']},"
-                    f"{self.mem_wb['FwdB']},"
-                    f"{self.mem_wb['MemRd']},"
-                    f"{self.mem_wb['MemWr']},"
-                    f"{self.mem_wb['WBSel']},"
-                    f"{self.mem_wb['bne']}")
+                if self.mem_wb:
+                    writer.writerow([
+                        i,
+                        self.mem_wb['instruction'],
+                        self.mem_wb['opcode'],
+                        self.mem_wb['funct3'],
+                        self.mem_wb['rd'],
+                        self.mem_wb['rs1'],
+                        self.mem_wb['rs2'],
+                        self.mem_wb['RegWrite'],
+                        self.mem_wb['ALUSrc'],
+                        self.mem_wb['FwdA'],
+                        self.mem_wb['FwdB'],
+                        self.mem_wb['MemRd'],
+                        self.mem_wb['MemWr'],
+                        self.mem_wb['WBSel'],
+                        self.mem_wb['bne'],
+                    ])
 
-            i += 1
+                i += 1
 
-            if (self.if_id is None and self.id_ex is None and
-                    self.ex_mem is None and self.mem_wb is None):
-                done = True
+                if (self.if_id is None and self.id_ex is None and
+                        self.ex_mem is None and self.mem_wb is None):
+                    done = True
+
+        print(f"Generated {output_csv}")
 
 if __name__ == "__main__":
     sim = Pipeline("hazard_instructions.bin")
-    sim.run_simulation()
+    sim.run_simulation("hazard_simulation.csv")
