@@ -108,8 +108,8 @@ class Pipeline:
                 
                 # Flush the accidentally fetched instruction from the Decode pipeline register
                 self.if_id = None 
-                
-        if self.id_ex["opcode"] == 19 and self.id_ex["rd"] == 5:
+
+        if self.id_ex["opcode"] == 19 and self.id_ex["rd"] == 5 and self.id_ex["rs1"] == 5:
             # If it's an addi targetting x5, decrement our counter
             self.x5 -= 1
 
