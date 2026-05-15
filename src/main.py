@@ -125,9 +125,10 @@ class Pipeline:
 
             i += 1
 
-            if i > 15:
+            if (self.if_id is None and self.id_ex is None and
+                    self.ex_mem is None and self.mem_wb is None):
                 done = True
 
 if __name__ == "__main__":
-    sim = Pipeline("risc-v_instructions.bin")
+    sim = Pipeline("branch_instructions.bin")
     sim.run_simulation()
