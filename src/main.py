@@ -97,7 +97,7 @@ class Pipeline:
             "val2": 0,                          # bne x5, x0, Loop (x0 is always 0)
             "imm": imm
         }
-    def execute(self):
+    def execute(self, old_mem_wb):
         fwd_a = fwd_b = 0
         if self.id_ex is None:
             self.ex_mem = None
@@ -107,14 +107,14 @@ class Pipeline:
             fwd_a = 2  # Forward from EX/MEM
 
         # If no EX Hazard, check for MEM Hazard (Older data)
-        elif self.mem_wb and self.id_ex["rs1"] == self.mem_wb["rd"] and self.mem_wb["RegWrite"] == 1 and self.mem_wb["rd"] != 0:
+        elif old_mem_wb and self.id_ex["rs1"] == old_mem_wb["rd"] and old_mem_wb["RegWrite"] == 1 and old_mem_wb["rd"] != 0:
             fwd_a = 1  # Forward from MEM/WB
 
         if self.ex_mem and self.id_ex["rs2"] == self.ex_mem["rd"] and self.ex_mem["RegWrite"] == 1 and self.ex_mem["rd"] != 0:
             # Trigger the FwdB signal
             fwd_b = 2
 
-        elif self.mem_wb and self.id_ex["rs2"] == self.mem_wb["rd"] and self.mem_wb["RegWrite"] == 1 and self.mem_wb["rd"] != 0:
+        elif old_mem_wb and self.id_ex["rs2"] == old_mem_wb["rd"] and old_mem_wb["RegWrite"] == 1 and old_mem_wb["rd"] != 0:
             fwd_b = 1
 
         
@@ -161,8 +161,11 @@ class Pipeline:
 
         while (done != True):
             self.write_back()
+
+            old_mem_wb = self.mem_wb
+
             self.memory()
-            self.execute()
+            self.execute(old_mem_wb)
             self.decode()
             self.fetch()
 
