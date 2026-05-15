@@ -58,6 +58,8 @@ class Pipeline:
             mem_wr = 1
         elif opcode == 19: # addi
             reg_write = 1
+        elif opcode == 99: # bne
+            bne = 1
 
         self.id_ex = {
             "instruction": instruction,
@@ -72,7 +74,8 @@ class Pipeline:
             "MemRd": mem_rd,
             "MemWr": mem_wr,
             "WBSel": wb_sel,
-            "bne": bne
+            "bne": bne,
+            "imm": imm
         }
     def execute(self):
 
