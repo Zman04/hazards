@@ -203,5 +203,5 @@ class Pipeline:
         print(f"Generated {output_csv}")
 
 if __name__ == "__main__":
-    sim = Pipeline("hazard_instructions.bin")
-    sim.run_simulation("hazard_simulation.csv")
+    sim = Pipeline("binaries/" + "hazard_instructions.bin")
+    sim.run_simulation("csvs/" + "hazard_simulation.csv")
