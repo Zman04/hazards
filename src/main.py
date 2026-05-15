@@ -59,6 +59,12 @@ class Pipeline:
             mem_wr = 1
         elif opcode == 19: # addi
             reg_write = 1
+        elif opcode == 51:
+            reg_write = 1
+            alu_src = 0
+            mem_rd = 0
+            mem_wr = 0
+            wb_sel = 0
         elif opcode == 99: # bne
             bne = 1
             imm_12    = (instruction >> 31) & 0x1
@@ -92,12 +98,24 @@ class Pipeline:
             "imm": imm
         }
     def execute(self):
+        fwd_a = fwd_b = 0
         if self.id_ex is None:
             self.ex_mem = None
             return
+        # Check for EX Hazard first (Most recent data)
         if self.ex_mem and self.id_ex["rs1"] == self.ex_mem["rd"] and self.ex_mem["RegWrite"] == 1 and self.ex_mem["rd"] != 0:
-            # Trigger the FwdA signal
-            fwd_a = 1
+            fwd_a = 2  # Forward from EX/MEM
+
+        # If no EX Hazard, check for MEM Hazard (Older data)
+        elif self.mem_wb and self.id_ex["rs1"] == self.mem_wb["rd"] and self.mem_wb["RegWrite"] == 1 and self.mem_wb["rd"] != 0:
+            fwd_a = 1  # Forward from MEM/WB
+
+        if self.ex_mem and self.id_ex["rs2"] == self.ex_mem["rd"] and self.ex_mem["RegWrite"] == 1 and self.ex_mem["rd"] != 0:
+            # Trigger the FwdB signal
+            fwd_b = 2
+
+        elif self.mem_wb and self.id_ex["rs2"] == self.mem_wb["rd"] and self.mem_wb["RegWrite"] == 1 and self.mem_wb["rd"] != 0:
+            fwd_b = 1
 
         
             
@@ -117,6 +135,9 @@ class Pipeline:
         if self.id_ex["opcode"] == 19 and self.id_ex["rd"] == 5 and self.id_ex["rs1"] == 5:
             # If it's an addi targetting x5, decrement our counter
             self.x5 -= 1
+
+        self.id_ex["FwdA"] = fwd_a
+        self.id_ex["FwdB"] = fwd_b
 
         # Pass the dictionary to the next stage
         self.ex_mem = self.id_ex
@@ -155,7 +176,8 @@ class Pipeline:
                     f"{self.mem_wb['rs2']},"
                     f"{self.mem_wb['RegWrite']},"
                     f"{self.mem_wb['ALUSrc']},"
-                    f"*,*,"  # Placeholders for FwdA and FwdB
+                    f"{self.mem_wb['FwdA']},"
+                    f"{self.mem_wb['FwdB']},"
                     f"{self.mem_wb['MemRd']},"
                     f"{self.mem_wb['MemWr']},"
                     f"{self.mem_wb['WBSel']},"
@@ -168,5 +190,5 @@ class Pipeline:
                 done = True
 
 if __name__ == "__main__":
-    sim = Pipeline("branch_instructions.bin")
+    sim = Pipeline("hazard_instructions.bin")
     sim.run_simulation()
