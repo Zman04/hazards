@@ -1,3 +1,9 @@
+'''
+Zachary Austin
+CS 4200
+Hazards
+5/15/26
+'''
 class Pipeline:
     def __init__(self, binary_path):
         self.pc = 0
@@ -203,5 +209,5 @@ class Pipeline:
         print(f"Generated {output_csv}")
 
 if __name__ == "__main__":
-    sim = Pipeline("binaries/" + "hazard_instructions.bin")
-    sim.run_simulation("csvs/" + "hazard_simulation.csv")
+    sim = Pipeline("binaries/" + "dynamic_instructions.bin")
+    sim.run_simulation("csvs/" + "dynamic_simulation.csv")

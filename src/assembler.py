@@ -38,12 +38,28 @@ integer_instructions = [
 instructions = [f"{instr:032b}" for instr in integer_instructions]
 '''
 
+#hazards instructions
+'''
 instructions = [
     "01000000001100001000000100110011",  # sub x2,  x1,  x3
     "00000000010100010111011000110011",  # and x12, x2,  x5
     "00000000001000110110011010110011",  # or  x13, x6,  x2
     "00000000110101100111000100110011",  # and x2,  x12, x13
     "00000000001000010000011100110011",  # add x14, x2,  x2
+]'''
+
+#dynamic instructions
+
+instructions = [
+    "00000000000000111010001100000011",  # lw   x6, 0(x7)
+    "00000000010000111010010000000011",  # lw   x8, 4(x7)
+    "00000000100000111010010010000011",  # lw   x9, 8(x7)
+    "00000000000100110000001100010011",  # addi x6, x6, 1
+    "00000000000101000000010000010011",  # addi x8, x8, 1
+    "00000000000101001000010010010011",  # addi x9, x9, 1
+    "00000000011000111010000000100011",  # sw   x6, 0(x7)
+    "00000000100000111010001000100011",  # sw   x8, 4(x7)
+    "00000000100100111010010000100011",  # sw   x9, 8(x7)
 ]
 for idx, ii in enumerate(instructions):
     if not len(ii) == 32:
@@ -60,5 +76,5 @@ for ii in instructions:
     all_bytes.append((ii >> 24) & mask)
 all_bytes_array = bytearray(all_bytes)
 bin(all_bytes_array[0]), bin(all_bytes_array[-1])
-with open("hazard_instructions.bin", 'wb+') as rv_file:
+with open("binaries/dynamic_instructions.bin", 'wb+') as rv_file:
     rv_file.write(all_bytes_array)
